@@ -17,14 +17,11 @@ pub fn build(b: *std.Build) !void {
         },
     });
 
-    const wave = try l.addWave(b, mod, .{
-        .wave = .{ .bits = 16, .format_code = .pcm },
+    const lib = b.addLibrary(.{
+        .name = "lightmix_splitter",
+        .root_module = mod,
     });
-    l.installWave(b, wave);
-
-    const play = try l.addPlay(b, wave, .{ .optimize = optimize });
-    const play_step = b.step("play", "Play the emitted Wavefile");
-    play_step.dependOn(&play.step);
+    b.installArtifact(lib);
 
     const mod_tests = b.addTest(.{
         .root_module = mod,
