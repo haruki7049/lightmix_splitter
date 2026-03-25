@@ -1,6 +1,30 @@
 const std = @import("std");
 const lightmix = @import("lightmix");
 
+test "Eight beat" {
+    const test_types = &.{f64};
+
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
+
+    defer {
+        const leaked = gpa.deinit();
+        if (leaked == .leak)
+            @panic("Memory leak happened");
+    }
+
+    // A number of samples per beat
+    const spb = samples_per_beat(120, 44100);
+    for (test_types) |T| {
+        const wave = try gen(T, .{
+            .allocator = allocator,
+            .amplitude = 1.0,
+            .length = spb * 8,
+        });
+        defer wave.deinit();
+    }
+}
+
 pub fn gen(comptime T: type, arguments: Arguments(T)) anyerror!lightmix.Wave(T) {
     var composer = lightmix.Composer(T).init(arguments.allocator, .{
         .channels = arguments.channels,
@@ -46,4 +70,14 @@ pub fn Arguments(comptime T: type) type {
         sample_rate: u32,
         channels: u16,
     };
+}
+
+/// Returns a number of samples per beat
+fn samples_per_beat(
+    /// BPM
+    bpm: usize,
+    /// Sample rate
+    spl: u32,
+) usize {
+    return @intFromFloat(@as(f32, @floatFromInt(60)) / @as(f32, @floatFromInt(bpm)) * @as(f32, @floatFromInt(spl)));
 }
