@@ -9,6 +9,14 @@
             .url = "https://github.com/haruki7049/lightmix/archive/refs/tags/0.18.2.tar.gz",
             .hash = "lightmix-0.18.2-SpCovB2BAgBqgOySOZ49txugvIEhWKTvMbaDTH-RnXlI",
         },
+        .lightmix_filters = .{
+            .url = "https://github.com/haruki7049/lightmix_filters/archive/refs/tags/0.4.1.tar.gz",
+            .hash = "lightmix_filters-0.4.1-QAX9gUoSIgCN-hrQVKEhSEv1l5LrScqBeKjpymXZ1lR4",
+        },
+        .lightmix_synths = .{
+            .url = "https://github.com/haruki7049/lightmix_synths/archive/refs/tags/0.3.1.tar.gz",
+            .hash = "lightmix_synths-0.3.1-6UeSjHLeigB7jyHa8lfqEmzTHfAGrr1eONf1zLhul2vA",
+        },
     },
 
     .paths = .{
