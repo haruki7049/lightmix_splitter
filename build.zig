@@ -49,6 +49,22 @@ pub fn build(b: *std.Build) !void {
 
     const test_step = b.step("test", "Run tests");
     test_step.dependOn(&run_mod_tests.step);
+
+    // "tests/eight_beats.zig"
+    const eight_beats_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tests/eight_beats.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "lightmix", .module = lightmix.module("lightmix") },
+                .{ .name = "lightmix_filters", .module = lightmix_filters.module("lightmix_filters") },
+                .{ .name = "lightmix_synths", .module = lightmix_synths.module("lightmix_synths") },
+            },
+        }),
+    });
+    const run_eight_beats_tests = b.addRunArtifact(eight_beats_tests);
+    test_step.dependOn(&run_eight_beats_tests.step);
 }
 
 fn build_example_program(b: *std.Build, args: BuildExampleProgramArgs) !void {
