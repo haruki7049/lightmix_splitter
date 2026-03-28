@@ -9,36 +9,74 @@ const sample_rate = 44100;
 const channels = 1;
 
 test {
-    const types = &.{f64};
     const allocator = std.testing.allocator;
 
     // Create a TmpDir
     var tmp = std.testing.tmpDir(.{});
     defer tmp.cleanup();
 
-    inline for (types) |T| {
-        const filename = "test-eight-beat-" ++ @typeName(T) ++ ".wav";
+    // PCM
+    {
+        const samples_types = &.{ f64, f80, f128 };
+        const bits = &.{ 16, 24, 32 };
 
-        // Create a lightmix.Wave(T)
-        const wave = try gen(T, allocator);
-        defer wave.deinit();
+        inline for (samples_types) |S| {
+            inline for (bits) |b| {
+                const b_str = std.fmt.comptimePrint("{d}", .{b});
+                const filename = "test-eight-beat-" ++ @typeName(S) ++ "-" ++ b_str ++ "bit-pcm.wav";
 
-        const bits = 16;
-        const bytes_per_sample = (bits + 7) / 8;
+                // Create a lightmix.Wave(S)
+                const wave = try gen(S, allocator);
+                defer wave.deinit();
 
-        const header_size = 44;
-        const total_size = header_size + (wave.samples.len * wave.channels * bytes_per_sample);
-        const file = try tmp.dir.createFile(filename, .{});
-        const buf = try allocator.alloc(u8, total_size);
-        defer allocator.free(buf);
+                const bytes_per_sample = (b + 7) / 8;
+                const header_size = 44;
+                const total_size = header_size + (wave.samples.len * wave.channels * bytes_per_sample);
+                const file = try tmp.dir.createFile(filename, .{});
+                const buf = try allocator.alloc(u8, total_size);
+                defer allocator.free(buf);
 
-        var writer = file.writer(buf);
-        try wave.write(&writer.interface, .{
-            .allocator = allocator,
-            .format_code = .pcm,
-            .bits = 16,
-        });
-        try writer.interface.flush();
+                var writer = file.writer(buf);
+                try wave.write(&writer.interface, .{
+                    .allocator = allocator,
+                    .format_code = .pcm,
+                    .bits = b,
+                });
+                try writer.interface.flush();
+            }
+        }
+    }
+
+    // IEEE Float
+    {
+        const samples_types = &.{ f64, f80, f128 };
+        const bits = &.{ 32, 64 };
+
+        inline for (samples_types) |S| {
+            inline for (bits) |b| {
+                const b_str = std.fmt.comptimePrint("{d}", .{b});
+                const filename = "test-eight-beat-" ++ @typeName(S) ++ "-" ++ b_str ++ "bit-ieee-float.wav";
+
+                // Create a lightmix.Wave(S)
+                const wave = try gen(S, allocator);
+                defer wave.deinit();
+
+                const bytes_per_sample = (b + 7) / 8;
+                const header_size = 44;
+                const total_size = header_size + (wave.samples.len * wave.channels * bytes_per_sample);
+                const file = try tmp.dir.createFile(filename, .{});
+                const buf = try allocator.alloc(u8, total_size);
+                defer allocator.free(buf);
+
+                var writer = file.writer(buf);
+                try wave.write(&writer.interface, .{
+                    .allocator = allocator,
+                    .format_code = .ieee_float,
+                    .bits = b,
+                });
+                try writer.interface.flush();
+            }
+        }
     }
 }
 
