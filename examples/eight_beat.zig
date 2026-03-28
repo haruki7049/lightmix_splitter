@@ -72,7 +72,6 @@ pub fn gen(allocator: std.mem.Allocator) anyerror!lightmix.Wave(SamplingType) {
         var symbals: [16]?lightmix.Wave(SamplingType) = undefined;
         for (symbals, 0..) |_, i| {
             const is_timing = i % 4 == 2;
-            std.debug.print("{any}\n", .{is_timing});
 
             if (is_timing) {
                 var w: lightmix.Wave(SamplingType) = try lightmix_synths.Basic.Triangle.gen(SamplingType, .{
@@ -94,14 +93,12 @@ pub fn gen(allocator: std.mem.Allocator) anyerror!lightmix.Wave(SamplingType) {
             }
         }
 
-        std.debug.print("Defer\n", .{});
         defer for (symbals) |wave| {
             if (wave != null) {
                 wave.?.deinit();
             }
         };
 
-        std.debug.print("Creating result\n", .{});
         const result: lightmix.Wave(f64) = try Splitter.gen(SamplingType, .{
             .allocator = allocator,
             .amplitude = 1.0,
@@ -111,11 +108,9 @@ pub fn gen(allocator: std.mem.Allocator) anyerror!lightmix.Wave(SamplingType) {
             .channels = channels,
         });
 
-        std.debug.print("Appending result to composer\n", .{});
         try composer.append(.{ .start_point = 0, .wave = result });
     }
 
-    std.debug.print("Finalize\n", .{});
     const result = try composer.finalize(.{});
     return result;
 }
