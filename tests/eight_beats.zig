@@ -79,7 +79,6 @@ fn gen(comptime T: type, allocator: std.mem.Allocator) anyerror!lightmix.Wave(T)
         .allocator = allocator,
         .amplitude = 1.0,
         .length = spb * 8,
-        .takes = 16,
         .waves = &waves,
         .sample_rate = sample_rate,
         .channels = channels,

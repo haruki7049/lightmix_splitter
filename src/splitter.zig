@@ -9,7 +9,7 @@ pub fn gen(comptime T: type, arguments: Arguments(T)) anyerror!lightmix.Wave(T) 
     defer composer.deinit();
 
     // Get a interval for each Wave
-    const interval: usize = arguments.length / arguments.takes;
+    const interval: usize = arguments.length / arguments.waves.len;
 
     // Creates a soundless Wave to creates a sustain for composed wave data
     const soundless_data = try arguments.allocator.alloc(T, arguments.length);
@@ -41,7 +41,6 @@ pub fn Arguments(comptime T: type) type {
         allocator: std.mem.Allocator,
         amplitude: f32,
         length: usize,
-        takes: usize,
         waves: []const ?lightmix.Wave(T),
         sample_rate: u32,
         channels: u16,
