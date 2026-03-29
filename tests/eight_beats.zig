@@ -33,6 +33,7 @@ test {
                 const header_size = 44;
                 const total_size = header_size + (wave.samples.len * wave.channels * bytes_per_sample);
                 const file = try tmp.dir.createFile(filename, .{});
+                defer file.close();
                 const buf = try allocator.alloc(u8, total_size);
                 defer allocator.free(buf);
 
